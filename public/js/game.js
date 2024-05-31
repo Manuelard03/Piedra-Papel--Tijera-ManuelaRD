@@ -5,7 +5,6 @@ ws.onmessage = (message) => {
     const data = JSON.parse(message.data);
     if (data.type === 'id') {
         playerId = data.id;
-        
     } else if (data.type === 'result') {
         document.getElementById('status').innerText = 'Juego completado';
         document.getElementById('opponentChoice').innerText = `El oponente eligió: ${data.opponentChoice}`;
@@ -14,7 +13,14 @@ ws.onmessage = (message) => {
 };
 
 function makeChoice(choice) {
-    ws.send(JSON.stringify({ type: 'choice', id: playerId, choice }));
-    document.getElementById('status').innerText = 'Esperando al oponente...';
+    if (playerId) {
+        ws.send(JSON.stringify({ type: 'choice', id: playerId, choice }));
+        document.getElementById('status').innerText = 'Esperando al oponente...';
+    } else {
+        console.error('Player ID is not defined');
+    }
 }
 
+document.querySelectorAll('.button').forEach(button => {
+    button.addEventListener('click', () => makeChoice(button.innerText.trim()));
+});
